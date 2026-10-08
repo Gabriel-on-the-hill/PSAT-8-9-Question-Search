@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PSAT 8/9 R&amp;W — Question Search (standalone)</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--primary:#2563eb;--pl:#60a5fa;--muted:#64748b;--border:#e2e8f0;--ink:#0f172a;}
+  *{box-sizing:border-box;}
+  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink);
+       background:#f8fafc;margin:0;line-height:1.55;}
+  .wrap{max-width:720px;margin:0 auto;padding:2.5rem 1.25rem 4rem;}
+  .kicker{display:flex;align-items:center;gap:.5rem;font-size:.82rem;font-weight:700;
+          color:var(--primary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.9rem;}
+  h1{font-size:1.8rem;margin:0 0 .4rem;}
+  .lede{color:var(--muted);font-size:1rem;margin:0 0 2rem;}
+  h2{font-size:1.05rem;margin:2.2rem 0 .8rem;padding-bottom:.4rem;border-bottom:1px solid var(--border);}
+  .card{display:flex;gap:.9rem;align-items:flex-start;text-decoration:none;color:inherit;
+        background:#fff;border:1px solid var(--border);border-radius:.8rem;padding:1rem 1.1rem;
+        margin-bottom:.7rem;transition:border-color .13s,box-shadow .13s,transform .12s;}
+  .card:hover{border-color:var(--pl);box-shadow:0 6px 18px rgba(15,23,42,.07);transform:translateY(-1px);}
+  .tag{flex-shrink:0;font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+       padding:.28rem .5rem;border-radius:.4rem;margin-top:.15rem;}
+  .tag-open{background:#dcfce7;color:#166534;}
+  .tag-doc{background:#dbeafe;color:#1e40af;}
+  .card b{font-size:.98rem;} .card .sub{color:var(--muted);font-size:.86rem;margin-top:.2rem;}
+  .cta{display:inline-flex;align-items:center;gap:.5rem;background:var(--primary);color:#fff;
+       text-decoration:none;font-weight:600;font-size:.95rem;padding:.8rem 1.3rem;border-radius:.6rem;
+       margin-top:.3rem;}
+  .cta:hover{background:#1d4ed8;}
+  .note{background:#eff6ff;border:1px solid #bfdbfe;border-radius:.6rem;padding:.8rem 1rem;
+        font-size:.88rem;color:#1e3a8a;margin-top:1.4rem;}
+  .foot{margin-top:2.5rem;color:var(--muted);font-size:.82rem;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    PSAT 8/9 R&amp;W · Standalone
+  </div>
+  <h1>Question Search</h1>
+  <p class="lede">A self-contained search over every Reading &amp; Writing question in the bank.
+  It runs entirely on its own — it does not touch or modify the practice app.</p>
+
+  <a class="cta" href="search.html">Open the search &rarr;</a>
+
+  <h2>What's in this folder</h2>
+
+  <a class="card" href="search.html">
+    <span class="tag tag-open">Open</span>
+    <span>
+      <b>search.html</b>
+      <div class="sub">The search page. Live search across question, passage/figure, choices,
+      explanation, skill, canonical ID &amp; retired ID; skill + PSAT difficulty + trust filters;
+      three sort modes; each result
+      expands to the full question with the correct answer marked and the explanation.</div>
+    </span>
+  </a>
+
+  <a class="card" href="SEARCH-and-IMPROVEMENTS.md">
+    <span class="tag tag-doc">Doc</span>
+    <span>
+      <b>SEARCH-and-IMPROVEMENTS.md</b>
+      <div class="sub">What was built &amp; verified, plus a prioritized audit of speed, accuracy,
+      and effectiveness improvements for the app in real-time use.</div>
+    </span>
+  </a>
+
+  <p class="sub" style="color:var(--muted);font-size:.82rem;margin-top:1rem">
+  The other files here — <code>style.css</code>, <code>nav.js</code>, the four
+  <code>data-*.js</code> banks and <code>assets/</code> — are copies of the app's own files that
+  <code>search.html</code> reads so it can run standalone. (<code>gate.js</code> and
+  <code>anti-cheat.js</code> are leftovers: nothing loads them any more, and they can be deleted.)</p>
+
+  <div class="note">
+    <b>Standalone.</b> Nothing in the practice app links to or depends on this page. To use it,
+    just open <code>search.html</code> — no password. To retire it, delete this
+    folder — the app is unaffected.
+  </div>
+
+  <p class="foot">Tested: every question in the bank loads and searches correctly · results render as plain
+  text, with no correct-answer flag and no search-term marks · all JS passes
+  <code>node --check</code>.</p>
+</div>
+</body>
+</html>

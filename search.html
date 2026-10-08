@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Search &middot; PSAT 8/9 R&amp;W</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=20260703">
+    <style>
+      /* Search page (scoped) */
+      .search-wrap { max-width: 860px; margin: 0 auto; padding: 1.25rem 1rem 4rem; padding-top: max(1.25rem, env(safe-area-inset-top)); }
+      .search-head { display: flex; align-items: center; gap: 0.55rem; font-size: 0.88rem; font-weight: 700; color: var(--primary); margin-bottom: 1.25rem; opacity: 0.9; }
+      .search-head a.back-link { margin-left: auto; font-size: 0.78rem; font-weight: 600; color: var(--text-muted); text-decoration: none; padding: 0.35rem 0.7rem; border: 1px solid var(--border); border-radius: 0.4rem; background: #f8fafc; white-space: nowrap; }
+      .search-title { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.25rem; }
+      .search-sub  { color: var(--text-muted); font-size: 0.92rem; margin: 0 0 1.1rem; }
+      .search-box { position: sticky; top: 0; z-index: 20; background: var(--background, #f8fafc); padding: 0.4rem 0 0.75rem; }
+      .search-input-row { position: relative; }
+      .search-input-row svg.mag { position: absolute; left: 0.9rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+      #searchInput { width: 100%; box-sizing: border-box; padding: 0.85rem 2.6rem 0.85rem 2.7rem; border: 1.5px solid var(--border); border-radius: 0.7rem; font-family: inherit; font-size: 1.02rem; outline: none; transition: border-color 0.15s, box-shadow 0.15s; background: #fff; }
+      #searchInput:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+      #clearBtn { position: absolute; right: 0.6rem; top: 50%; transform: translateY(-50%); border: none; background: transparent; cursor: pointer; color: var(--text-muted); font-size: 1.25rem; line-height: 1; padding: 0.25rem 0.45rem; border-radius: 0.4rem; display: none; }
+      #clearBtn:hover { background: #f1f5f9; color: #0f172a; }
+      .filter-row { display: flex; flex-wrap: wrap; gap: 0.5rem 0.75rem; align-items: center; margin-top: 0.7rem; }
+      .filter-row select { padding: 0.45rem 0.6rem; border: 1.5px solid var(--border); border-radius: 0.5rem; font-family: inherit; font-size: 0.85rem; background: #fff; color: #0f172a; cursor: pointer; }
+      .diff-chips { display: flex; gap: 0.4rem; }
+      .diff-chip { font-size: 0.78rem; font-weight: 600; cursor: pointer; user-select: none; padding: 0.4rem 0.7rem; border-radius: 999px; border: 1.5px solid var(--border); background: #fff; color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.35rem; transition: all 0.13s; }
+      .diff-chip .dot { width: 0.55rem; height: 0.55rem; border-radius: 50%; }
+      .diff-chip[data-on="1"] { color: #0f172a; border-color: var(--primary-light); background: #eff6ff; }
+      .dot-easy { background: #22c55e; } .dot-medium { background: #f59e0b; } .dot-hard { background: #ef4444; }
+      .result-meta { font-size: 0.82rem; color: var(--text-muted); margin: 0.4rem 0 0.9rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+      .result-meta b { color: #0f172a; }
+      .result-card { background: var(--surface, #fff); border: 1px solid var(--border); border-radius: 0.9rem; margin-bottom: 0.7rem; overflow: hidden; transition: border-color 0.13s, box-shadow 0.13s; }
+      .result-card:hover { border-color: var(--primary-light); box-shadow: var(--shadow, 0 4px 14px rgba(15,23,42,0.06)); }
+      .result-summary { list-style: none; cursor: pointer; padding: 0.9rem 1rem; display: flex; gap: 0.75rem; align-items: flex-start; }
+      .result-summary::-webkit-details-marker { display: none; }
+      .result-badges { display: flex; flex-direction: column; gap: 0.35rem; flex-shrink: 0; min-width: 0; }
+      .result-body-text { flex: 1; min-width: 0; }
+      .result-q { font-weight: 600; font-size: 0.96rem; line-height: 1.4; color: #0f172a; }
+      .result-snip { font-size: 0.83rem; color: var(--text-muted); line-height: 1.45; margin-top: 0.35rem; display: block; }
+      .result-chev { flex-shrink: 0; color: var(--text-muted); transition: transform 0.18s; margin-top: 0.15rem; }
+      details[open] .result-chev { transform: rotate(90deg); }
+      .badge-diff-easy { background: #dcfce7; color: #166534; }
+      .badge-diff-medium { background: #fef3c7; color: #92400e; }
+      .badge-diff-hard { background: #fee2e2; color: #991b1b; }
+      .badge-id { background: #f1f5f9; color: #64748b; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 600; }
+      .badge-provisional { background: #fff; color: #64748b; border: 1.5px dashed #94a3b8; }
+      .badge-native { background: #f8fafc; color: #64748b; }
+      .result-detail { padding: 0 1rem 1.1rem; border-top: 1px dashed var(--border); animation: fade 0.16s ease; }
+      @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+      .detail-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); margin: 1rem 0 0.35rem; }
+      .detail-passage { font-size: 0.9rem; line-height: 1.55; color: #334155; white-space: pre-wrap; }
+      .detail-passage.figure { background: #f8fafc; border: 1px solid var(--border); border-radius: 0.6rem; padding: 0.7rem 0.85rem; }
+      .detail-img { max-width: 100%; border: 1px solid var(--border); border-radius: 0.6rem; margin-top: 0.5rem; }
+      .detail-q { font-weight: 600; font-size: 0.98rem; line-height: 1.45; color: #0f172a; margin-top: 0.35rem; }
+      .opt-list { list-style: none; padding: 0; margin: 0.55rem 0 0; display: grid; gap: 0.4rem; }
+      .opt { font-size: 0.9rem; line-height: 1.4; padding: 0.55rem 0.7rem; border: 1.5px solid var(--border); border-radius: 0.55rem; color: #334155; }
+      .detail-expl { font-size: 0.88rem; line-height: 1.6; color: #334155; white-space: pre-wrap; }
+      .empty-state { text-align: center; color: var(--text-muted); padding: 3rem 1rem; }
+      .empty-state svg { opacity: 0.35; margin-bottom: 0.75rem; }
+      .empty-state h3 { color: #334155; font-size: 1.05rem; margin: 0 0 0.35rem; }
+      .empty-state p { margin: 0; font-size: 0.9rem; }
+      .more-note { text-align: center; font-size: 0.82rem; color: var(--text-muted); padding: 0.6rem; }
+    </style>
+</head>
+<body>
+    <div class="search-wrap">
+
+      <div class="search-head">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
+        </svg>
+        PSAT 8/9 R&amp;W
+        <a href="index.html" class="back-link" title="Back to Hub">&larr; Hub</a>
+      </div>
+
+      <h1 class="search-title">Search the question bank</h1>
+      <p class="search-sub">Find any question by wording, topic, passage text, answer choice, or explanation &mdash; then open it in Practice.</p>
+
+      <div class="search-box">
+        <div class="search-input-row">
+          <svg class="mag" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input id="searchInput" type="search" autocomplete="off" spellcheck="false" placeholder="Search questions, passages, topics&hellip;" aria-label="Search questions">
+          <button id="clearBtn" title="Clear (Esc)" aria-label="Clear search">&times;</button>
+        </div>
+
+        <div class="filter-row">
+          <select id="skillFilter" aria-label="Filter by skill">
+            <option value="">All skills</option>
+          </select>
+          <select id="trustFilter" aria-label="Filter by calibration status">
+            <option value="">All sources</option>
+            <option value="trusted">Trusted</option>
+            <option value="provisional">Provisional</option>
+          </select>
+          <div class="diff-chips" id="diffChips">
+            <span class="diff-chip" data-diff="Easy"   data-on="1"><span class="dot dot-easy"></span>Easy</span>
+            <span class="diff-chip" data-diff="Medium" data-on="1"><span class="dot dot-medium"></span>Medium</span>
+            <span class="diff-chip" data-diff="Hard"   data-on="1"><span class="dot dot-hard"></span>Hard</span>
+          </div>
+          <select id="sortSelect" aria-label="Sort results" style="margin-left:auto">
+            <option value="relevance">Sort: Relevance</option>
+            <option value="difficulty">Sort: Difficulty</option>
+            <option value="skill">Sort: Skill</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="result-meta" id="resultMeta"></div>
+      <div id="results"></div>
+
+    </div>
+
+    <script src="data-craft-structure.js?v=20261008"></script>
+    <script src="data-expression-of-ideas.js?v=20261008"></script>
+    <script src="data-info-ideas.js?v=20261008"></script>
+    <script src="data-conventions.js?v=20261008"></script>
+    <script src="nav.js?v=20260703" defer></script>
+
+    <script>
+    (function () {
+      'use strict';
+
+      var BANK = [].concat(
+        typeof questionBank_CS  !== 'undefined' ? questionBank_CS  : [],
+        typeof questionBank_EOI !== 'undefined' ? questionBank_EOI : [],
+        typeof questionBank_II  !== 'undefined' ? questionBank_II  : [],
+        typeof questionBank_CON !== 'undefined' ? questionBank_CON : []
+      );
+
+      var DIFF_RANK = { Easy: 0, Medium: 1, Hard: 2 };
+      function difficultyOf(q) { return q.psatDifficulty || q.difficulty; }
+
+      // Normalize text so curly quotes/apostrophes, dashes and odd spacing
+      // don't block matches (the bank has thousands of “smart” quotes).
+      function normalize(s) {
+        return String(s == null ? '' : s)
+          .toLowerCase()
+          .replace(/[\u2018\u2019\u201A\u201B]/g, "'")   // curly single quotes -> '
+          .replace(/[\u201C\u201D\u201E\u201F]/g, '"')   // curly double quotes -> "
+          .replace(/[\u2013\u2014]/g, '-')                 // en/em dash -> -
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+
+      BANK.forEach(function (q) {
+        var opts = Array.isArray(q.options) ? q.options.join(' ') : '';
+        q._passageText = (q.passage && q.passage.trim()) ? q.passage
+                         : (q.alt ? String(q.alt).replace(/^Data figure[.:]\s*/i, '').replace(/\s*The figure and the text that goes with it are shown as an image\.$/, '') : '');
+        q._hay = normalize([
+          q.question, q._passageText, opts, q.explanation, q.skill, q.id,
+          (q.altIds || []).join(' '), q.origin, q.psatDifficultyFrom
+        ].join('  '));
+      });
+
+      var input     = document.getElementById('searchInput');
+      var clearBtn  = document.getElementById('clearBtn');
+      var skillSel  = document.getElementById('skillFilter');
+      var trustSel  = document.getElementById('trustFilter');
+      var sortSel   = document.getElementById('sortSelect');
+      var diffWrap  = document.getElementById('diffChips');
+      var resultsEl = document.getElementById('results');
+      var metaEl    = document.getElementById('resultMeta');
+      var MAX_RENDER = 120;
+
+      (function () {
+        var counts = {};
+        BANK.forEach(function (q) { counts[q.skill] = (counts[q.skill] || 0) + 1; });
+        Object.keys(counts).sort().forEach(function (s) {
+          var o = document.createElement('option');
+          o.value = s; o.textContent = s + ' (' + counts[s] + ')';
+          skillSel.appendChild(o);
+        });
+      })();
+
+      function escapeHtml(s) {
+        return String(s == null ? '' : s)
+          .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      }
+      function tokens(query) { return normalize(query).split(' ').filter(function (t) { return t.length > 0; }); }
+
+      // Results render as plain text: no search-term marks, and no visual
+      // flag on the correct option. The answer is still stated in the
+      // explanation ("Choice B is the best answer"), which is where a
+      // student should have to go to find it.
+      function highlight(text) {
+        // keep the bank's <u>…</u> marks (underlined-portion questions) as real underlines
+        return escapeHtml(text).replace(/&lt;u&gt;/g, '<u>').replace(/&lt;\/u&gt;/g, '</u>');
+      }
+
+      function snippet(text, toks, radius) {
+        if (!text) return '';
+        radius = radius || 90;
+        var low = text.toLowerCase(), pos = -1;
+        for (var i = 0; i < toks.length; i++) {
+          var p = low.indexOf(toks[i]);
+          if (p !== -1 && (pos === -1 || p < pos)) pos = p;
+        }
+        if (pos === -1) {
+          var head = text.slice(0, radius * 2);
+          return escapeHtml(head) + (text.length > head.length ? '…' : '');
+        }
+        var start = Math.max(0, pos - radius);
+        var end   = Math.min(text.length, pos + radius);
+        var frag  = (start > 0 ? '…' : '') + text.slice(start, end) + (end < text.length ? '…' : '');
+        return escapeHtml(frag);
+      }
+
+      function activeDiffs() {
+        return Array.prototype.map.call(diffWrap.querySelectorAll('.diff-chip[data-on="1"]'),
+          function (c) { return c.getAttribute('data-diff'); });
+      }
+
+      function score(q, toks) {
+        var s = 0;
+        var ql = q.question.toLowerCase();
+        var pl = q._passageText.toLowerCase();
+        toks.forEach(function (t) {
+          if (ql.indexOf(t) !== -1) s += 10;
+          if (pl.indexOf(t) !== -1) s += 4;
+          if (q.skill.toLowerCase().indexOf(t) !== -1) s += 6;
+          if (q._hay.indexOf(t) !== -1) s += 1;
+        });
+        return s;
+      }
+
+      function run() {
+        var q      = input.value.trim();
+        var toks   = tokens(q);
+        var skill  = skillSel.value;
+        var diffs  = activeDiffs();
+        var sortBy = sortSel.value;
+
+        var matches = BANK.filter(function (item) {
+          if (skill && item.skill !== skill) return false;
+          if (diffs.indexOf(difficultyOf(item)) === -1) return false;
+          if (trustSel.value === 'provisional' && item.difficultyStatus !== 'provisional') return false;
+          if (trustSel.value === 'trusted' && item.difficultyStatus === 'provisional') return false;
+          for (var i = 0; i < toks.length; i++) {
+            if (item._hay.indexOf(toks[i]) === -1) return false;
+          }
+          return true;
+        });
+
+        if (sortBy === 'difficulty') {
+          matches.sort(function (a, b) { return (DIFF_RANK[difficultyOf(a)] - DIFF_RANK[difficultyOf(b)]) || score(b, toks) - score(a, toks); });
+        } else if (sortBy === 'skill') {
+          matches.sort(function (a, b) { return a.skill.localeCompare(b.skill) || (DIFF_RANK[difficultyOf(a)] - DIFF_RANK[difficultyOf(b)]); });
+        } else if (toks.length) {
+          matches.sort(function (a, b) { return score(b, toks) - score(a, toks); });
+        }
+
+        render(matches, toks, q);
+      }
+
+      function render(matches, toks, rawQuery) {
+        clearBtn.style.display = rawQuery ? 'block' : 'none';
+        var total = BANK.length;
+        if (rawQuery || skillSel.value || trustSel.value || activeDiffs().length < 3) {
+          metaEl.innerHTML = '<b>' + matches.length + '</b> of ' + total + ' questions'
+            + (rawQuery ? ' matching “' + escapeHtml(rawQuery) + '”' : '');
+        } else {
+          metaEl.innerHTML = 'Browsing all <b>' + total + '</b> questions — start typing to search.';
+        }
+
+        if (!matches.length) {
+          resultsEl.innerHTML =
+            '<div class="empty-state">'
+            + '<svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>'
+            + '<h3>No questions found</h3>'
+            + '<p>Try fewer or different words, or widen the skill / difficulty filters.</p>'
+            + '</div>';
+          return;
+        }
+
+        var shown = matches.slice(0, MAX_RENDER);
+        var html = shown.map(function (q) { return card(q, toks); }).join('');
+        if (matches.length > MAX_RENDER) {
+          html += '<div class="more-note">Showing the first ' + MAX_RENDER + ' of ' + matches.length
+                + ' — refine your search to narrow further.</div>';
+        }
+        resultsEl.innerHTML = html;
+      }
+
+      function diffBadgeClass(d) {
+        return d === 'Easy' ? 'badge-diff-easy' : d === 'Hard' ? 'badge-diff-hard' : 'badge-diff-medium';
+      }
+
+      function card(q, toks) {
+        var displayDifficulty = difficultyOf(q);
+        var snipSource = (q._passageText || q.explanation || '').replace(/<\/?u>/g, '');   // snippets are plain text
+        var snip = toks.length ? snippet(snipSource, toks, 90)
+                   : escapeHtml(snipSource.slice(0, 150)) + (snipSource.length > 150 ? '…' : '');
+
+        var opts = (q.options || []).map(function (opt) {
+          return '<li class="opt">' + highlight(opt) + '</li>';
+        }).join('');
+
+        var passageBlock = '';
+        if (q._passageText) {
+          var isFig = !!q.image;
+          passageBlock = '<div class="detail-label">' + (isFig ? 'Figure / passage' : 'Passage') + '</div>'
+            + '<div class="detail-passage' + (isFig ? ' figure' : '') + '">' + highlight(q._passageText) + '</div>';
+        }
+        var imgBlock = q.image
+          ? '<img class="detail-img" src="' + escapeHtml(q.image) + '" alt="' + escapeHtml(q.alt || '') + '" loading="lazy">'
+          : '';
+        var provisionalBadge = q.difficultyStatus === 'provisional'
+          ? '<span class="badge badge-provisional">Provisional</span>' : '';
+        var nativeBadge = q.difficulty && q.difficulty !== displayDifficulty
+          ? '<span class="badge badge-native">SAT source: ' + escapeHtml(q.difficulty) + '</span>' : '';
+        var aliasesBlock = (q.altIds || []).length
+          ? '<div class="detail-label">Retired IDs</div><div class="detail-expl">' +
+            highlight(q.altIds.join(', ')) + '</div>' : '';
+
+        return ''
+          + '<details class="result-card">'
+          +   '<summary class="result-summary">'
+          +     '<span class="result-badges">'
+          +       '<span class="badge badge-blue">' + escapeHtml(q.skill) + '</span>'
+          +       '<span class="badge ' + diffBadgeClass(displayDifficulty) + '">' + displayDifficulty + '</span>'
+          +       provisionalBadge
+          +       nativeBadge
+          +       '<span class="badge badge-id">#' + escapeHtml(q.id) + '</span>'
+          +     '</span>'
+          +     '<span class="result-body-text">'
+          +       '<span class="result-q">' + highlight(q.question) + '</span>'
+          +       (snip ? '<span class="result-snip">' + snip + '</span>' : '')
+          +     '</span>'
+          +     '<svg class="result-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>'
+          +   '</summary>'
+          +   '<div class="result-detail">'
+          +     passageBlock
+          +     imgBlock
+          +     '<div class="detail-label">Question</div>'
+          +     '<div class="detail-q">' + highlight(q.question) + '</div>'
+          +     '<ul class="opt-list">' + opts + '</ul>'
+          +     '<div class="detail-label">Explanation</div>'
+          +     '<div class="detail-expl">' + highlight(q.explanation || '') + '</div>'
+          +     aliasesBlock
+          +   '</div>'
+          + '</details>';
+      }
+
+      var debounceTimer;
+      function schedule() { clearTimeout(debounceTimer); debounceTimer = setTimeout(run, 110); }
+
+      input.addEventListener('input', schedule);
+      skillSel.addEventListener('change', run);
+      trustSel.addEventListener('change', run);
+      sortSel.addEventListener('change', run);
+      clearBtn.addEventListener('click', function () { input.value = ''; run(); input.focus(); });
+
+      diffWrap.addEventListener('click', function (e) {
+        var chip = e.target.closest('.diff-chip');
+        if (!chip) return;
+        chip.setAttribute('data-on', chip.getAttribute('data-on') === '1' ? '0' : '1');
+        run();
+      });
+
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && document.activeElement === input) {
+          if (input.value) { input.value = ''; run(); } else input.blur();
+        }
+        if (e.key === '/' && document.activeElement !== input) { e.preventDefault(); input.focus(); }
+      });
+
+      (function () {
+        var m = /[?&]q=([^&]*)/.exec(location.search);
+        if (m) { try { input.value = decodeURIComponent(m[1].replace(/\+/g, ' ')); } catch (e) {} }
+      })();
+
+      run();
+      input.focus();
+    })();
+    </script>
+</body>
+</html>
